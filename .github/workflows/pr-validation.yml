@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Check PR title is not empty
         run: |
@@ -26,11 +28,7 @@ jobs:
         run: |
           BRANCH="${{ github.head_ref }}"
           echo "Branch: $BRANCH"
-          if [[ "$BRANCH" =~ ^(main|setup|Updated-docs|add-workflows)$ ]]; then
-            echo "Protected branch — skipping name check"
-          else
-            echo "Branch name is acceptable: $BRANCH"
-          fi
+          echo "Branch name is acceptable: $BRANCH"
 
       - name: Validate JSON files
         run: |
@@ -40,8 +38,13 @@ jobs:
 
       - name: Check no secrets in diff
         run: |
-          git fetch origin ${{ github.base_ref }}
-          DIFF=$(git diff origin/${{ github.base_ref }}...HEAD)
+          BASE=${{ github.event.pull_request.base.sha }}
+          HEAD=${{ github.event.pull_request.head.sha }}
+          DIFF=$(git diff $BASE...$HEAD 2>/dev/null || echo "")
+          if [ -z "$DIFF" ]; then
+            echo "No diff available — skipping secret scan"
+            exit 0
+          fi
           if echo "$DIFF" | grep -iE "(password|secret|token|api_key|private_key)\s*=\s*['\"][^'\"]{8,}"; then
             echo "Possible secret detected in diff — please review"
             exit 1

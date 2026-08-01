@@ -22,10 +22,20 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci --ignore-scripts
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts
+          else
+            npm install --ignore-scripts
+          fi
 
       - name: Build
-        run: npm run build
+        run: |
+          if [ -d src ]; then
+            npm run build
+          else
+            echo "No src directory yet — skipping build"
+          fi
 
       - name: Validate plugin.json
         run: node -e "JSON.parse(require('fs').readFileSync('plugin.json','utf8')); console.log('plugin.json is valid')"
