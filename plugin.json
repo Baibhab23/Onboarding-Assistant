@@ -1,0 +1,23 @@
+{
+  "name": "dev-setup",
+  "version": "1.0.0",
+  "description": "Codebase Onboarding Assistant — auto-discovers and executes dev environment setup from GitHub, wikis, and external docs",
+  "author": {
+    "name": "Baibhab Dey",
+    "email": "deybaibhab18@gmail.com"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/Baibhab23/dev-setup",
+  "keywords": ["onboarding", "setup", "devenv", "docker", "automation", "mcp"],
+  "baseDependency": "developer-intelligence",
+  "mcpServers": {
+    "dev-setup-github": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/dist/mcp/github-server.js"]
+    },
+    "dev-setup-docker": {
+      "command": "npx",
+      "args": ["-y", "@hypnosis/docker-mcp-server"]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "dev-setup",
+  "version": "1.0.0",
+  "description": "Codebase Onboarding Assistant — auto-discovers and executes dev environment setup from GitHub, wikis, and external docs",
+  "author": "Baibhab Dey <deybaibhab18@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Baibhab23/dev-setup.git"
+  },
+  "keywords": ["onboarding", "setup", "devenv", "docker", "mcp", "claude-code"],
+  "main": "dist/mcp/github-server.js",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
