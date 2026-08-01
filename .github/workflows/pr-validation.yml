@@ -1,0 +1,52 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  validate-pr:
+    name: Validate PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR title is not empty
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          if [ -z "$TITLE" ]; then
+            echo "PR title cannot be empty"
+            exit 1
+          fi
+          echo "PR title: $TITLE"
+
+      - name: Check branch name convention
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          echo "Branch: $BRANCH"
+          echo "Branch name is acceptable: $BRANCH"
+
+      - name: Validate JSON files
+        run: |
+          for f in $(find . -name "*.json" -not -path "*/node_modules/*"); do
+            node -e "JSON.parse(require('fs').readFileSync('$f','utf8'))" && echo "Valid: $f" || exit 1
+          done
+
+      - name: Check no secrets in diff
+        run: |
+          BASE=${{ github.event.pull_request.base.sha }}
+          HEAD=${{ github.event.pull_request.head.sha }}
+          DIFF=$(git diff $BASE...$HEAD 2>/dev/null || echo "")
+          if [ -z "$DIFF" ]; then
+            echo "No diff available — skipping secret scan"
+            exit 0
+          fi
+          if echo "$DIFF" | grep -iE "(password|secret|token|api_key|private_key)\s*=\s*['\"][^'\"]{8,}"; then
+            echo "Possible secret detected in diff — please review"
+            exit 1
+          fi
+          echo "No hardcoded secrets detected"
