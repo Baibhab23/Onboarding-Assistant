@@ -18,16 +18,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-          cache: npm
+          node-version: 20
 
       - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci --ignore-scripts
-          else
-            npm install --ignore-scripts
-          fi
+        run: npm install --ignore-scripts
 
       - name: Build
         run: |
